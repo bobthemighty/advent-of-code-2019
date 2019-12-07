@@ -20,6 +20,13 @@ class Point:
     def __mul__(self, num: int):
         return Point(self.x * num, self.y * num)
 
+    @property
+    def distance(self):
+        return self.x + self.y
+
+    def __lt__(self, other):
+        return self.distance < other.distance
+
 
 VECTORS = {"U": Point(0, 1), "L": Point(-1, 0), "D": Point(0, -1), "R": Point(1, 0)}
 
@@ -43,10 +50,10 @@ class Path(list):
     def current_pos(self):
         return self[-1]
 
-    def crosses(self, other):
+    def closest_intersection(self, other):
         a = set(self[1:])
         b = set(other[1:])
-        return list(a.intersection(b))
+        return min(a.intersection(b))
 
 
 def test_empty_path():
@@ -85,4 +92,4 @@ def test_intersections():
     a = Path(['R8','U5','L5','D3'])
     b = Path(['U7','R6','D4','L4'])
 
-    assert a.crosses(b) == [Point(3, 3), Point(6, 5)]
+    assert a.closest_intersection(b) == Point(3, 3)
