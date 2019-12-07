@@ -26,26 +26,19 @@ class Direction(Enum):
     Left = "L"
     Right = "R"
 
+VECTORS = {
+    Direction.Up: Point(0, 1),
+    Direction.Left: Point(-1, 0),
+    Direction.Down: Point(0, -1),
+    Direction.Right: Point(1, 0)
+}
 
-@dataclass
-class Segment:
 
-    direction: Direction
-    distance: int
-
-    def vector(self):
-        if self.direction == Direction.Up:
-            return Point(0, 1)
-        if self.direction == Direction.Down:
-            return Point(0, -1)
-        if self.direction == Direction.Left:
-            return Point(-1, 0)
-        if self.direction == Direction.Right:
-            return Point(1, 0)
-
-    def points_from(self, p: Point):
-       v = self.vector()
-       return [p + (v * d) for d in range(1, self.distance + 1)] 
+def line_segment(origin, direction, distance):
+    v = VECTORS[direction]
+    return [
+        origin + (v * d) for d in range(1, distance + 1)
+    ]
 
 
 class Path(list):
@@ -53,9 +46,8 @@ class Path(list):
     def __init__(self):
         self.append(Point.origin())
 
-    def apply(self, move: Segment):
-        points = move.points_from(self.current_pos)
-        self += points
+    def add_segment(self, direction, distance):
+        self += line_segment(self.current_pos, direction, distance)
 
     @property
     def current_pos(self):
@@ -68,15 +60,15 @@ def test_empty_path():
 
 
 @pytest.mark.parametrize(
-    "move, result",
+    "direction, distance, result",
     [
-        (Segment(Direction.Right, 3), [(0, 0), (1, 0), (2, 0), (3, 0)]),
-        (Segment(Direction.Left, 2), [(0, 0), (-1, 0), (-2, 0)]),
-        (Segment(Direction.Up, 1), [(0, 0), (0, 1)]),
-        (Segment(Direction.Down, 4), [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
+        (Direction.Right, 3, [(0, 0), (1, 0), (2, 0), (3, 0)]),
+        (Direction.Left, 2, [(0, 0), (-1, 0), (-2, 0)]),
+        (Direction.Up, 1, [(0, 0), (0, 1)]),
+        (Direction.Down, 4, [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
     ],
 )
-def test_single_move(move, result):
+def test_single_move(direction, distance, result):
     path = Path()
-    path.apply(move)
+    path.add_segment(direction, distance)
     assert path == [Point(*p) for p in result]
