@@ -28,7 +28,7 @@ class Direction(Enum):
 
 
 @dataclass
-class Move:
+class Step:
 
     direction: Direction
     distance: int
@@ -48,32 +48,35 @@ class Move:
        return [p + (v * d) for d in range(1, self.distance + 1)] 
 
 
-class Position:
+class Path(list):
 
     def __init__(self):
-        self.current_pos = Point.origin()
-        self.history = [self.current_pos]
+        self.append(Point.origin())
 
-    def apply(self, move: Move):
+    def apply(self, move: Step):
         points = move.points_from(self.current_pos)
-        self.history += points
-        self.current_pos = points[-1]
+        self += points
+
+    @property
+    def current_pos(self):
+        return self[-1]
+
 
 def test_empty_path():
-    pos = Position()
-    assert pos.history == [Point.origin()]
+    path = Path()
+    assert path == [Point.origin()]
 
 
 @pytest.mark.parametrize(
     "move, result",
     [
-        (Move(Direction.Right, 3), [(0, 0), (1, 0), (2, 0), (3, 0)]),
-        (Move(Direction.Left, 2), [(0, 0), (-1, 0), (-2, 0)]),
-        (Move(Direction.Up, 1), [(0, 0), (0, 1)]),
-        (Move(Direction.Down, 4), [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
+        (Step(Direction.Right, 3), [(0, 0), (1, 0), (2, 0), (3, 0)]),
+        (Step(Direction.Left, 2), [(0, 0), (-1, 0), (-2, 0)]),
+        (Step(Direction.Up, 1), [(0, 0), (0, 1)]),
+        (Step(Direction.Down, 4), [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
     ],
 )
 def test_single_move(move, result):
-    pos = Position()
-    pos.apply(move)
-    assert pos.history == [Point(*p) for p in result]
+    path = Path()
+    path.apply(move)
+    assert path == [Point(*p) for p in result]
