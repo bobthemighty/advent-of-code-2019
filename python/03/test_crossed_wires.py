@@ -30,8 +30,11 @@ def line_segment(origin, direction, distance):
 
 
 class Path(list):
-    def __init__(self):
+    def __init__(self, segments=None):
         self.append(Point.origin())
+        if segments:
+            for seg in segments:
+                self.add_segment(seg[0], int(seg[1:]))
 
     def add_segment(self, direction, distance):
         self += line_segment(self.current_pos, direction, distance)
@@ -69,3 +72,6 @@ def test_multi_moves():
     path.add_segment("L", 1)
 
     assert path == [Point(*p) for p in [(0, 0), (1, 0), (1, 1), (1, 0), (0, 0)]]
+
+    assert path == Path(['R1', 'U1', 'D1', 'L1'])
+
