@@ -1,3 +1,5 @@
+import itertools
+
 ADD = 1
 MULT = 2
 HALT = 99
@@ -54,6 +56,16 @@ if __name__ == "__main__":
     input[1] = 12
     input[2] = 2
 
-    print(run(input))
+    print(run(input.copy()))
 
+
+    candidates = itertools.permutations(range(0, 100), 2)
+    for candidate in candidates:
+
+        input[1] = candidate[0]
+        input[2] = candidate[1]
+
+        if (run(input.copy())) == 19690720:
+            print(candidate)
+            break
 
