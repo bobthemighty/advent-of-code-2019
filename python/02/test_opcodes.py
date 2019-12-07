@@ -66,6 +66,6 @@ if __name__ == "__main__":
         input[2] = verb
 
         if (run(input.copy())) == 19690720:
-            print (100 * (noun + verb))
+            print (100 * noun + verb)
             break
 
