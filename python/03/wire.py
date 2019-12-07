@@ -47,6 +47,16 @@ class Wire(list):
     def endpoint(self):
         return self[-1]
 
+    def length_at(self, p):
+        return self.index(p)
+
+    def cheapest_intersection(self, other):
+        a = set(self[1:])
+        b = set(other[1:])
+        return min(a.intersection(b), key=lambda p: self.length_at(p) + other.length_at(p))
+
+
+
     def closest_intersection(self, other):
         a = set(self[1:])
         b = set(other[1:])

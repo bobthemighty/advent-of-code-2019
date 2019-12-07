@@ -8,3 +8,5 @@ def read():
 if __name__ == "__main__":
   a, b = read()
   print(a.closest_intersection(b).distance)
+  p = a.cheapest_intersection(b)
+  print(a.length_at(p) + b.length_at(p))

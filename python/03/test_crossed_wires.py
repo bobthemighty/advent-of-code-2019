@@ -1,7 +1,4 @@
 from enum import Enum
-from dataclasses import dataclass
-from typing import List
-
 import pytest
 
 from wire import Wire, Point
@@ -62,3 +59,28 @@ def test_examples(a, b, expected):
 
    crossing = path_a.closest_intersection(path_b)
    assert crossing.distance == expected
+
+def test_length():
+    path = Wire(['R3', 'U2', 'R2'])
+
+    assert path.length_at(Point(2, 0)) == 2
+    assert path.length_at(Point(3, 2)) == 5
+    assert path.length_at(Point(4, 2)) == 6
+
+
+@pytest.mark.parametrize("a, b, expected",[
+    ('R75,D30,R83,U83,L12,D49,R71,U7,L72',
+     'U62,R66,U55,R34,D71,R55,D58,R83',
+     610
+    ),
+    ('R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51',
+     'U98,R91,D20,R16,D67,R40,U7,R15,U6,R7',
+     410
+    )
+])
+def test_energy_examples(a, b, expected):
+   path_a = Wire(a.split(','))
+   path_b = Wire(b.split(','))
+
+   crossing = path_a.cheapest_intersection(path_b)
+   assert path_a.length_at(crossing) + path_b.length_at(crossing) == expected
