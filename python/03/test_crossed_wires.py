@@ -28,7 +28,7 @@ class Direction(Enum):
 
 
 @dataclass
-class Step:
+class Segment:
 
     direction: Direction
     distance: int
@@ -53,7 +53,7 @@ class Path(list):
     def __init__(self):
         self.append(Point.origin())
 
-    def apply(self, move: Step):
+    def apply(self, move: Segment):
         points = move.points_from(self.current_pos)
         self += points
 
@@ -70,10 +70,10 @@ def test_empty_path():
 @pytest.mark.parametrize(
     "move, result",
     [
-        (Step(Direction.Right, 3), [(0, 0), (1, 0), (2, 0), (3, 0)]),
-        (Step(Direction.Left, 2), [(0, 0), (-1, 0), (-2, 0)]),
-        (Step(Direction.Up, 1), [(0, 0), (0, 1)]),
-        (Step(Direction.Down, 4), [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
+        (Segment(Direction.Right, 3), [(0, 0), (1, 0), (2, 0), (3, 0)]),
+        (Segment(Direction.Left, 2), [(0, 0), (-1, 0), (-2, 0)]),
+        (Segment(Direction.Up, 1), [(0, 0), (0, 1)]),
+        (Segment(Direction.Down, 4), [(0, 0), (0, -1), (0, -2), (0, -3), (0, -4)]),
     ],
 )
 def test_single_move(move, result):
