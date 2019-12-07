@@ -60,12 +60,12 @@ if __name__ == "__main__":
 
 
     candidates = itertools.permutations(range(0, 100), 2)
-    for candidate in candidates:
+    for noun, verb in candidates:
 
-        input[1] = candidate[0]
-        input[2] = candidate[1]
+        input[1] = noun
+        input[2] = verb
 
         if (run(input.copy())) == 19690720:
-            print(candidate)
+            print (100 * (noun + verb))
             break
 
