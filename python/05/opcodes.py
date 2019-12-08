@@ -1,10 +1,5 @@
 from collections import namedtuple
 
-F=0
-A=1
-B=2
-C=3
-
 POSITION=0
 IMMEDIATE=1
 
@@ -14,7 +9,7 @@ STOR = 3
 OUT = 4
 HALT = 99
 
-operator = namedtuple('_operator', 'code,mode')
+operator = namedtuple('_operator', 'opcode,a,b,c')
 
 class Computer:
 
@@ -40,7 +35,7 @@ class Computer:
                 break
 
     def _parse_op(self):
-        code = self._arg(F)
+        code = self._next()
         op = code % 100
         code -= op
 
@@ -53,46 +48,39 @@ class Computer:
         mode3 = code % 100000
         code -= mode3
 
-        return operator(op, [
-            IMMEDIATE, mode1 and 1 or 0, mode2 and 1 or 0, mode3 and 1 or 0
-        ])
+        return operator(op, mode1 and 1 or 0, mode2 and 1 or 0, mode3 and 1 or 0)
 
 
-    def _arg(self, pos, op=None):
-        v = self.tape[self.head + pos]
-        if op and op.mode[pos] == POSITION:
+    def _next(self, mode=IMMEDIATE):
+        v = self.tape[self.head]
+        self.head += 1
+        if mode == POSITION:
             return self.tape[v]
         return v
 
     def _exec(self):
-        op = self._parse_op()
-        print(op)
-        mv = self.funcs[op.code](op)
-        self.head += mv
-
+        op  = self._parse_op()
+        self.funcs[op.opcode](op)
 
     def _halt(self, _):
         raise StopIteration()
 
     def _store(self, _):
         v = self._input.pop()
-        out = self._arg(A)
+        out = self._next()
         self.tape[out] = v
-        return 2
 
     def _output(self, op):
-        v = self._arg(A, op)
+        v = self._next(op.a)
         self.output.append(v)
-        return 2
 
     def _binop(self, f):
         def _f(op) :
-            a = self._arg(A, op)
-            b = self._arg(B, op)
-            out = self._arg(C)
+            a = self._next(op.a)
+            b = self._next(op.b)
+            out = self._next()
             self.tape[out] = f(a, b)
             self.value = self.tape[out]
-            return 4
         return _f
 
 
