@@ -17,12 +17,9 @@ operator = namedtuple('_operator', 'opcode,a,b,c')
 
 class Computer:
 
-    def __init__(self, tape, input=None):
-        self._input = input.copy() if input else []
+    def __init__(self, program):
         self.output = []
-        self.tape = tape.copy()
-        self.head = 0
-        self.value = None
+        self.program = program.copy()
         self.funcs = {
             ADD: self._binop(lambda a,b : a + b),
             MULT: self._binop(lambda a, b: a * b),
@@ -35,7 +32,14 @@ class Computer:
             LT: self._binop(lambda a, b: 1 if a < b else 0)
         }
 
-    def run(self):
+    def _reset(self):
+        self.tape = self.program.copy()
+        self.head = 0
+        self.value = None
+
+    def run(self, input=None):
+        self._reset()
+        self._input = input.copy() if input else []
         while True:
             try:
                 self._exec()

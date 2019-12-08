@@ -17,8 +17,8 @@ def test_two_step_program():
     ]) == 30
 
 def test_echo():
-    prog = Computer([3,0,4,0,99], [66])
-    prog.run()
+    prog = Computer([3,0,4,0,99])
+    prog.run([66])
 
     assert prog.output == [66]
 
@@ -29,12 +29,20 @@ def test_immediate_multiply():
     assert prog.value == 99
 
 def test_is_equal_to_eight():
-    prog = Computer([3,9,8,9,10,9,4,9,99,-1,8], [8])
-    prog.run()
-    assert prog.output == [1]
+    prog = Computer([3,9,8,9,10,9,4,9,99,-1,8])
+
+    prog.run([8])
+    prog.run([9])
+    assert prog.output == [1, 0]
 
 
-def test_is_not_equal_to_eight():
-    prog = Computer([3,9,8,9,10,9,4,9,99,-1,8], [7])
-    prog.run()
-    assert prog.output == [0]
+def test_less_than_eight():
+    tape = [3,9,7,9,10,9,4,9,99,-1,8]
+
+    prog = Computer(tape)
+
+    prog.run([7])
+    prog.run([8])
+    prog.run([9])
+
+    assert prog.output == [1, 0, 0]
