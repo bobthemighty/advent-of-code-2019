@@ -42,7 +42,8 @@ class Computer:
         self._input = input.copy() if input else []
         while True:
             try:
-                self._exec()
+                op  = self._parse_op()
+                self.funcs[op.opcode](op)
             except StopIteration:
                 break
 
@@ -69,10 +70,6 @@ class Computer:
         if mode == POSITION:
             return self.tape[v]
         return v
-
-    def _exec(self):
-        op  = self._parse_op()
-        self.funcs[op.opcode](op)
 
     def _halt(self, _):
         raise StopIteration()
