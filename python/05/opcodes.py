@@ -7,6 +7,10 @@ ADD = 1
 MULT = 2
 STOR = 3
 OUT = 4
+JIT = 5
+JIF = 6
+LT = 7
+EQ = 8
 HALT = 99
 
 operator = namedtuple('_operator', 'opcode,a,b,c')
@@ -24,7 +28,11 @@ class Computer:
             MULT: self._binop(lambda a, b: a * b),
             HALT: self._halt,
             STOR: self._store,
-            OUT: self._output
+            OUT: self._output,
+            JIT: self._jmp(True),
+            JIF: self._jmp(False),
+            EQ: self._binop(lambda a, b: 1 if a == b else 0),
+            LT: self._binop(lambda a, b: 1 if a < b else 0)
         }
 
     def run(self):
@@ -73,6 +81,14 @@ class Computer:
     def _output(self, op):
         v = self._next(op.a)
         self.output.append(v)
+
+    def _jmp(self, v):
+        def f(op):
+            a = self.next(op.a)
+            b = self.next(op.b)
+            if bool(a) == v:
+                self.head = b
+        return f
 
     def _binop(self, f):
         def _f(op) :
