@@ -21,3 +21,20 @@ def test_echo():
     prog.run()
 
     assert prog.output == [66]
+
+def test_immediate_multiply():
+    prog = Computer([1002,4,3,4,33])
+    prog.run()
+
+    assert prog.value == 99
+
+def test_is_equal_to_eight():
+    prog = Computer([3,9,8,9,10,9,4,9,99,-1,8], [8])
+    prog.run()
+    assert prog.output == [1]
+
+
+def test_is_not_equal_to_eight():
+    prog = Computer([3,9,8,9,10,9,4,9,99,-1,8], [7])
+    prog.run()
+    assert prog.output == [0]
