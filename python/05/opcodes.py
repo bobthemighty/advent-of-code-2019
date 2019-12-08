@@ -1,8 +1,15 @@
+from collections import namedtuple
+
+POSITION=0
+IMMEDIATE=1
+
 ADD = 1
 MULT = 2
 STOR = 3
 OUT = 4
 HALT = 99
+
+operator = namedtuple('_operator', 'opcode,a,b,c')
 
 class Computer:
 
@@ -27,36 +34,50 @@ class Computer:
             except StopIteration:
                 break
 
+    def _parse_op(self):
+        code = self._next()
+        op = code % 100
+        code -= op
 
-    def _next(self):
+        mode1 = code % 1000
+        code -= mode1
+
+        mode2 = code % 10000
+        code -= mode2
+
+        mode3 = code % 100000
+        code -= mode3
+
+        return operator(op, mode1 and 1 or 0, mode2 and 1 or 0, mode3 and 1 or 0)
+
+
+    def _next(self, mode=IMMEDIATE):
         v = self.tape[self.head]
         self.head += 1
+        if mode == POSITION:
+            return self.tape[v]
         return v
 
     def _exec(self):
-        op = self._next()
-        self.funcs[op]()
+        op  = self._parse_op()
+        self.funcs[op.opcode](op)
 
-    def _halt(self):
+    def _halt(self, _):
         raise StopIteration()
 
-    def _store(self):
+    def _store(self, _):
         v = self._input.pop()
         out = self._next()
         self.tape[out] = v
 
-    def _output(self):
-        v = self._deref()
+    def _output(self, op):
+        v = self._next(op.a)
         self.output.append(v)
 
-    def _deref(self):
-        p = self._next()
-        return self.tape[p]
-
     def _binop(self, f):
-        def _f() :
-            a = self._deref()
-            b = self._deref()
+        def _f(op) :
+            a = self._next(op.a)
+            b = self._next(op.b)
             out = self._next()
             self.tape[out] = f(a, b)
             self.value = self.tape[out]
