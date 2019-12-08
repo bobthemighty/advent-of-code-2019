@@ -88,8 +88,8 @@ class Computer:
 
     def _jmp(self, v):
         def f(op):
-            a = self.next(op.a)
-            b = self.next(op.b)
+            a = self._next(op.a)
+            b = self._next(op.b)
             if bool(a) == v:
                 self.head = b
         return f

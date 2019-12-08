@@ -46,3 +46,20 @@ def test_less_than_eight():
     prog.run([9])
 
     assert prog.output == [1, 0, 0]
+
+def test_is_non_zero_positional():
+    prog = Computer([3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9])
+    prog.run([0])
+    prog.run([1])
+    prog.run([0])
+
+    assert prog.output == [0, 1, 0]
+
+
+def test_is_non_zero_immediate():
+    prog = Computer([3,3,1105,-1,9,1101,0,0,12,4,12,99,1])
+    prog.run([0])
+    prog.run([1])
+    prog.run([0])
+
+    assert prog.output == [0, 1, 0]
