@@ -75,6 +75,7 @@ class Computer:
         raise StopIteration()
 
     def _store(self, _):
+        print('wut')
         v = self._input.pop()
         out = self._next()
         self.tape[out] = v

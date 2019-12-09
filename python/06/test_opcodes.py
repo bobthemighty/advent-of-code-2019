@@ -15,13 +15,13 @@ class AmplifierArray:
         self.tasks = []
 
     async def run(self, phases):
-        next_queue = Queue()
-        await next_queue.put(0)
+        first_queue = next_queue = Queue()
 
         for computer, phase in zip(self.array, phases):
             self.tasks.append(computer.run(next_queue))
             await next_queue.put(phase)
             next_queue = computer.output
+        await first_queue.put(0)
         await gather(*self.tasks)
         return await next_queue.get()
 
