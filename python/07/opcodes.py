@@ -47,6 +47,9 @@ class Computer:
                 await self.funcs[op.opcode](op)
             except StopIteration:
                 break
+            except Exception as e:
+                raise
+
 
     def _parse_op(self):
         code = self._next()
@@ -76,15 +79,12 @@ class Computer:
         raise StopIteration()
 
     async def _store(self, _):
-        print(f'{self}: waiting for input')
         v = await self._input.get()
-        print(f'{self}: received input {v}')
         out = self._next()
         self.tape[out] = v
 
     async def _output(self, op):
         v = self._next(op.a)
-        print(f'{self}: sending value {v}')
         await self.output.put(v)
 
     def _jmp(self, v):
