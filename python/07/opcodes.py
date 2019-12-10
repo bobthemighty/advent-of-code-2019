@@ -1,3 +1,4 @@
+from asyncio import Queue
 from collections import namedtuple
 
 POSITION=0
@@ -18,7 +19,7 @@ operator = namedtuple('_operator', 'opcode,a,b,c')
 class Computer:
 
     def __init__(self, program):
-        self.output = []
+        self.output = Queue()
         self.program = program.copy()
         self.funcs = {
             ADD: self._binop(lambda a,b : a + b),
@@ -37,15 +38,18 @@ class Computer:
         self.head = 0
         self.value = None
 
-    def run(self, input=None):
+    async def run(self, input=None):
         self._reset()
-        self._input = input.copy() if input else []
+        self._input = input or Queue()
         while True:
             try:
                 op  = self._parse_op()
-                self.funcs[op.opcode](op)
+                await self.funcs[op.opcode](op)
             except StopIteration:
                 break
+            except Exception as e:
+                raise
+
 
     def _parse_op(self):
         code = self._next()
@@ -74,18 +78,17 @@ class Computer:
     def _halt(self, _):
         raise StopIteration()
 
-    def _store(self, _):
-        print('wut')
-        v = self._input.pop()
+    async def _store(self, _):
+        v = await self._input.get()
         out = self._next()
         self.tape[out] = v
 
-    def _output(self, op):
+    async def _output(self, op):
         v = self._next(op.a)
-        self.output.append(v)
+        await self.output.put(v)
 
     def _jmp(self, v):
-        def f(op):
+        async def f(op):
             a = self._next(op.a)
             b = self._next(op.b)
             if bool(a) == v:
@@ -93,7 +96,7 @@ class Computer:
         return f
 
     def _binop(self, f):
-        def _f(op) :
+        async def _f(op) :
             a = self._next(op.a)
             b = self._next(op.b)
             out = self._next()
@@ -102,8 +105,8 @@ class Computer:
         return _f
 
 
-def run(tape):
+async def run(tape):
     cmp = Computer(tape)
 
-    cmp.run()
+    await cmp.run()
     return cmp.value
