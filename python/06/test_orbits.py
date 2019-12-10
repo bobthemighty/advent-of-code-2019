@@ -19,6 +19,11 @@ class Universe:
     def total_orbits(self):
         return sum(o.orbits for o in self.objects.values())
 
+    def transfer_distance(self, origin, dest):
+        origin_to = self[origin].ancestors
+        dest_to = self[dest].ancestors
+        return min( (origin_to[k] + dest_to[k]) for k in origin_to if k in dest_to )
+
 
 class Mass:
 
@@ -34,6 +39,17 @@ class Mass:
         if self.parent is None:
             return 0
         return 1 + self.parent.orbits
+
+    @property
+    def ancestors(self):
+        parent = self.parent
+        dist = 0
+        ancestors = {}
+        while parent is not None:
+            ancestors[parent.name] = dist
+            dist += 1
+            parent = parent.parent
+        return ancestors
 
 
 def test_centre():
@@ -77,9 +93,28 @@ def test_acceptance():
 
     assert universe.total_orbits == 42
 
+def test_transfers():
+    universe = Universe()
+    universe.add('b', 'com')
+    universe.add('c', 'b')
+    universe.add('d', 'c')
+    universe.add('e', 'd')
+    universe.add('f', 'e')
+    universe.add('g', 'b')
+    universe.add('h', 'g')
+    universe.add('i', 'd')
+    universe.add('j', 'e')
+    universe.add('k', 'j')
+    universe.add('l', 'k')
+    universe.add('you', 'k')
+    universe.add('san', 'i')
+
+    assert universe.transfer_distance('you', 'san') == 4
+
 if __name__ == "__main__":
     universe = Universe()
     for parent, child in (line.split(')') for line in fileinput.input()):
         universe.add(child.strip(), parent.strip())
 
     print(universe.total_orbits)
+    print(universe.transfer_distance('YOU', 'SAN'))
